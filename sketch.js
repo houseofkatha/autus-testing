@@ -31,31 +31,16 @@ async function setup() {
   generateBackgroundBuffers();
   arcStartTime = millis();
 
-  // ----------------------------------------
-  // DESKTOP: unlock auto arc on mouse
-  // MOBILE: keep auto arc locked forever
-  // ----------------------------------------
-  const isTouchDevice =
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0;
-
-  if (!isTouchDevice) {
-    // Desktop only: unlock when mouse is used
-    window.addEventListener(
-      "pointermove",
-      (e) => {
-        if (e.pointerType === "mouse") {
-          allowAutoArc = false;
-        }
-      },
-      { once: true }
-    );
-  } else {
-    // Mobile: force non-interactive auto arc
-    allowAutoArc = true;
-    autoArcDone = false;
-  }
+  // 🔒 HARD DESKTOP DETECTION
+  window.addEventListener(
+    "pointermove",
+    (e) => {
+      if (e.pointerType === "mouse") {
+        allowAutoArc = false;
+      }
+    },
+    { once: true }
+  );
 
   // PRE-ALLOCATE PARTICLES
   for (let i = 0; i < TARGET_STARS; i++) {
@@ -223,17 +208,17 @@ class Star {
 
     this.x +=
       (noise(this.y * 0.01, tNoise) - 0.5) *
-        this.speed *
-        freedom +
+      this.speed *
+      freedom +
       this.speed * 0.45;
 
     this.y +=
       (noise(this.x * 0.01, tNoise + 200) - 0.5) *
-        this.speed *
-        freedom +
+      this.speed *
+      freedom +
       (curveY - this.y) *
-        attractStrength *
-        (1 - eased * 0.6);
+      attractStrength *
+      (1 - eased * 0.6);
 
     const margin = 30;
     if (
