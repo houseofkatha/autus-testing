@@ -31,16 +31,31 @@ async function setup() {
   generateBackgroundBuffers();
   arcStartTime = millis();
 
-  // 🔒 HARD DESKTOP DETECTION
-  window.addEventListener(
-    "pointermove",
-    (e) => {
-      if (e.pointerType === "mouse") {
-        allowAutoArc = false;
-      }
-    },
-    { once: true }
-  );
+  // ----------------------------------------
+  // DESKTOP: unlock auto arc on mouse
+  // MOBILE: keep auto arc locked forever
+  // ----------------------------------------
+  const isTouchDevice =
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0 ||
+    navigator.msMaxTouchPoints > 0;
+
+  if (!isTouchDevice) {
+    // Desktop only: unlock when mouse is used
+    window.addEventListener(
+      "pointermove",
+      (e) => {
+        if (e.pointerType === "mouse") {
+          allowAutoArc = false;
+        }
+      },
+      { once: true }
+    );
+  } else {
+    // Mobile: force non-interactive auto arc
+    allowAutoArc = true;
+    autoArcDone = false;
+  }
 
   // PRE-ALLOCATE PARTICLES
   for (let i = 0; i < TARGET_STARS; i++) {
